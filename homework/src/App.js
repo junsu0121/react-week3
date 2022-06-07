@@ -1,7 +1,6 @@
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import Main from "./Main";
-import MainLogin from "./MainLogin";
 import SignUp from "./SignUp";
 import Login from "./Login";
 import Upload from "./Upload";
@@ -11,12 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { auth, db } from "./shared/firebase";
 //만든 auth 임포트
-import {
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
-//파이어베이스의 auth의 로그인 임포트
+import { onAuthStateChanged, signOut } from "firebase/auth";
+//파이어베이스의 auth의 로그인 임포트 , signOut은 로그아웃 위해 임포트
 import { getDocs, where, query, collection } from "firebase/firestore";
 import { async } from "@firebase/util";
 
@@ -53,12 +48,14 @@ function App() {
   const loginCheck = async (user) => {
     if (user) {
       setIsLogin(true);
+      //is_login State 값 true false로 loginCheck
     } else {
       setIsLogin(false);
     }
   };
   React.useEffect(() => {
     onAuthStateChanged(auth, loginCheck);
+    //useEffect이용해서 loginCheck 함수 이용해서 onAuthStateChanged로 로그인 여부확인
   }, []);
   return (
     <div className="App">
@@ -70,22 +67,27 @@ function App() {
                 <FontAwesomeIcon icon={faHouse} />
               </span>
             </Link>
-            <Link to="signup">
-              <div>Sign Up</div>
+            <Link to="/signup">
+              <div style={{ textDecoration: "none", color: "black" }}>
+                Sign Up
+              </div>
             </Link>
 
             {is_login ? (
-              <button
+              //로그인 여부확인
+              <div
                 onClick={() => {
                   signOut(auth);
                   //누르면 로그아웃까지
                 }}
               >
                 Log Out
-              </button>
+              </div>
             ) : (
               <Link to="/login">
-                <div>Log In</div>
+                <div style={{ textDecoration: "none", color: "black" }}>
+                  Log In
+                </div>
               </Link>
             )}
           </Menu>
@@ -94,12 +96,6 @@ function App() {
         <Routes>
           {/* switch 대신 routes */}
           <Route path="/" element={<Main post={post} />}></Route>
-          {is_login ? (
-            <Route path="/" element={<Main post={post} />}></Route>
-          ) : (
-            <Route path="/login" element={<Login />}></Route>
-          )}
-          <Route path="/mainlogin" element={<MainLogin />}></Route>
           <Route path="/signup" element={<SignUp />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/upload" element={<Upload />}></Route>

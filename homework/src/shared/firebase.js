@@ -3,6 +3,8 @@ import { getAuth } from "firebase/auth";
 //auth 설정해주기
 import { getFirestore } from "firebase/firestore";
 //파이어스토어도 여기서 같이 설정
+import { getStorage } from "firebase/storage";
+//이미지 가져오기 위해 임포트
 
 const firebaseConfig = {
   //인증정보!
@@ -21,5 +23,6 @@ export const auth = getAuth();
 //export auth 해주기
 export const db = getFirestore(app);
 //파이어스토어도 사용할 수 있도록 export
-
+export const storage = getStorage(app);
+//스토리지 export
 export default app;
