@@ -13,9 +13,17 @@ import { auth, db } from "./shared/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 //파이어베이스의 auth의 로그인 임포트 , signOut은 로그아웃 위해 임포트
 import { getDocs, where, query, collection } from "firebase/firestore";
-import { async } from "@firebase/util";
+import { loadContentFB } from "./redux/modules/homework";
+import { useDispatch } from "react-redux";
 
 function App() {
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    //화면에 mount(떳을) 때 실행
+    dispatch(loadContentFB());
+    // return 하면  unmount될 때 실행
+    console.log();
+  }, [dispatch]);
   const post = [
     {
       user_info: {
@@ -67,11 +75,16 @@ function App() {
                 <FontAwesomeIcon icon={faHouse} />
               </span>
             </Link>
-            <Link to="/signup">
-              <div style={{ textDecoration: "none", color: "black" }}>
-                Sign Up
-              </div>
-            </Link>
+            {is_login ? (
+              //&& 앞에 것이 참이면 뒤에 실행!
+              <></>
+            ) : (
+              <Link to="/signup">
+                <div style={{ textDecoration: "none", color: "black" }}>
+                  Sign Up
+                </div>
+              </Link>
+            )}
 
             {is_login ? (
               //로그인 여부확인
@@ -101,7 +114,7 @@ function App() {
           <Route path="/upload" element={<Upload />}></Route>
           {/* component 대신 element */}
           {/* <Route path="/cat/:name" element={<Cat />}></Route> */}
-          <Route path="/modify" element={<Modify />}></Route>
+          <Route path="/modify/:index" element={<Modify />}></Route>
           {/* :name 으로 파라미터 이름지정 */}
         </Routes>
       </Container>

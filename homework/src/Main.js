@@ -3,12 +3,19 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "./shared/firebase";
 //만든 auth 임포트
 import { onAuthStateChanged } from "firebase/auth";
+import { useSelector, useDispatch } from "react-redux";
+import { deleteContentFB } from "./redux/modules/homework";
 
 const Main = (props) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const content_list = useSelector((state) => state.homework.list);
+  console.log(content_list, "글구나");
+  // firestore 데이터 불러오기
   const [is_login, setIsLogin] = React.useState(false);
   const loginCheck = async (user) => {
     if (user) {
@@ -17,26 +24,47 @@ const Main = (props) => {
       setIsLogin(false);
     }
   };
+
   React.useEffect(() => {
     onAuthStateChanged(auth, loginCheck);
   }, []);
-  const post = props.post;
 
   return (
     <>
-      {post.map((list, index) => {
-        console.log(list.user_info.user_profile);
+      {content_list.map((list, index) => {
+        console.log(index);
         return (
           <ContentsWrap key={index}>
             <div>
               <span>
-                <Profile src={list.user_info.user_profile} />
+                <Profile src="https://firebasestorage.googleapis.com/v0/b/authex-bbc58.appspot.com/o/images%2Ftest.jpeg?alt=media&token=22e64495-e33c-447f-9e29-29ec390d89d7" />
               </span>
-              <UserName>{list.user_info.user_name}.</UserName>{" "}
-              <Date>{list.insert_dt}</Date>
+              <UserName>name</UserName> <Date>2022.06.09</Date>
+              {is_login && (
+                //&& 앞에 것이 참이면 뒤에 실행!
+                <Btn
+                  onClick={() => {
+                    navigate(`modify/${index}`);
+                  }}
+                >
+                  수정하기
+                </Btn>
+              )}
+              {is_login && (
+                //&& 앞에 것이 참이면 뒤에 실행!
+                <DeleteBtn
+                  onClick={() => {
+                    // console.log(삭제하기 버튼을 눌렀어!);
+                    // dispatch(deleteWord(idx));
+                    dispatch(deleteContentFB(content_list[index].id));
+                  }}
+                >
+                  삭제하기
+                </DeleteBtn>
+              )}
             </div>
             <hr />
-            <Contents>{list.contents}</Contents>
+            <Contents>{list.content}</Contents>
             <ContentImgWrap>
               <ContentImg src={list.image_url} />
             </ContentImgWrap>
@@ -50,7 +78,8 @@ const Main = (props) => {
           </ContentsWrap>
         );
       })}
-      {is_login ? (
+      {is_login && (
+        //&& 앞에 것이 참이면 뒤에 실행!
         <Link to="/upload">
           <FontAwesomeIcon
             icon={faCirclePlus}
@@ -63,8 +92,6 @@ const Main = (props) => {
             }}
           />
         </Link>
-      ) : (
-        <></>
       )}
     </>
   );
@@ -115,4 +142,31 @@ const Comment = styled.div`
 const ContentsWrap = styled.div`
   margin-top: 10px;
   margin-bottom: 10px;
+`;
+
+const Btn = styled.button`
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 1;
+  margin-left: 430px;
+  height: 20px;
+  font-size: 15px;
+  background-color: white;
+  &:hover {
+    background-color: lightgrey;
+  }
+`;
+const DeleteBtn = styled.button`
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 1;
+  margin-left: 20px;
+  height: 20px;
+  font-size: 15px;
+  background-color: white;
+  &:hover {
+    background-color: lightgrey;
+  }
 `;

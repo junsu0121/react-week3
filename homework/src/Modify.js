@@ -1,8 +1,46 @@
 import React from "react";
 import styled from "styled-components";
+import { useParams, useNavigate } from "react-router-dom";
+import { db, storage } from "./shared/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
+import { useDispatch, useSelector } from "react-redux";
+import { modifyContentFB } from "./redux/modules/homework";
 
-const Modify = () => {
+const Modify = (props) => {
+  const params = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const content_index = params.index;
+  const content_list = useSelector((state) => state.homework.list);
   const modify_ref = React.useRef();
+  const file_link_ref = React.useRef(null);
+
+  const uploadImgFB = async (e) => {
+    console.log(e.target.files);
+    const uploaded_file = await uploadBytes(
+      ref(storage, `images/${e.target.files[0].name}`),
+      e.target.files[0]
+    );
+    console.log(uploaded_file);
+    const file_url = await getDownloadURL(uploaded_file.ref);
+    console.log(file_url);
+    file_link_ref.current = { url: file_url };
+  };
+
+  const modifyContentList = () => {
+    dispatch(
+      modifyContentFB({
+        content: modify_ref.current.value,
+        image_url: file_link_ref.current.url,
+        // id: params,
+        id: content_list[content_index].id,
+        //id 값 보내기!
+      })
+    );
+    // console.log(file_link_ref.current.url, "이거");
+    navigate("/");
+  };
   return (
     <>
       <ContentsWrap>
@@ -10,18 +48,16 @@ const Modify = () => {
         <hr />
         <h3>이미지 변경</h3>
         <ImgUploadWrap>
-          <input />
-          <ImgBtn>파일 찾기</ImgBtn>
+          <input type="file" onChange={uploadImgFB} />
         </ImgUploadWrap>
         <h3>게시글 수정</h3>
         <ContentTextArea
           type="text"
-          placeholder="게시글 작성"
+          placeholder="게시글 수정"
           ref={modify_ref}
         />
         <BtnWrap>
-          <Btn>게시글 수정</Btn>
-          <Btn>게시글 삭제</Btn>
+          <Btn onClick={modifyContentList}>게시글 수정</Btn>
         </BtnWrap>
       </ContentsWrap>
     </>

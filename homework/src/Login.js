@@ -6,14 +6,32 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 //파이어베이스의 auth의 로그인 임포트
 import { getDocs, where, query, collection } from "firebase/firestore";
 //getDocs를 이용해서 닉네임 가져옴, 근데 id가 임의값이여서 where을 사용해야함, query와 collection도 필요!
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
   const id_ref = React.useRef(null);
   const pw_ref = React.useRef(null);
 
+  const emailCheck = (email) => {
+    let _reg =
+      /^[0-9a-zA-Z]([-_.0-9a-zA-Z])*@[0-9a-zA-Z]([-_.0-9a-zA-Z])*.([a-zA-Z])*/;
+    return _reg.test(email);
+  };
+
   const loginFB = async () => {
     //벨리데이션 필수!
+    if (id_ref.current.value === "" || pw_ref.current.value === "") {
+      window.alert("이메일 혹은 비밀번호가 공란! 입력해주세요!");
+      return;
+    }
+    if (!emailCheck(id_ref.current.value)) {
+      window.alert("이메일 형식이 맞지 않습니다!");
+      return;
+    } else {
+      navigate("/");
+    }
+
     console.log(id_ref.current.value, pw_ref.current.value);
     const user = await signInWithEmailAndPassword(
       auth,
@@ -40,9 +58,7 @@ const Login = () => {
         <Input placeholder="이메일을 입력해주세요!" ref={id_ref} />
         <h3>비밀번호</h3>
         <Input placeholder="비밀번호를 입력해주세요!" ref={pw_ref} />
-        <Link to="/">
-          <Btn onClick={loginFB}>Log In</Btn>
-        </Link>
+        <Btn onClick={loginFB}>Log In</Btn>
       </SignUpWrap>
     </>
   );
@@ -79,3 +95,48 @@ const Btn = styled.button`
   }
 `;
 export default Login;
+
+// const Login = (props) => {
+// const dispatch = useDispatch();
+
+// const [id, setId] = useState("");
+// const [pwd, setPwd] = useState("");
+
+// const login = () => {
+//   if (!emailCheck(id)) {
+//     window.alert("이메일 형식이 올바르지 않습니다!");
+//   }
+
+//   dispatch(userActions.loginFB(id, pwd));
+// };
+
+// return (
+//   <Grid padding="16px">
+//     <Title>로그인</Title>
+//     <Input
+//       value={id}
+//       label="아이디"
+//       placeholder="아이디를 입력해주세용!"
+//       _onChange={(e) => {
+//         setId(e.target.value);
+//       }}
+//     />
+//     <Input
+//       value={pwd}
+//       type="password"
+//       label="비밀번호"
+//       placeholder="비밀번호를 입력해주세용!"
+//       _onChange={(e) => {
+//         setPwd(e.target.value);
+//       }}
+//       is_submit
+//       _onSubmit={login}
+//     />
+//     <Button
+//       margin="30px 0"
+//       _onClick={login}
+//       _disabled={id === "" || pwd === "" ? true : false}
+//     >
+//       로그인하기
+//     </Button>
+//   </Grid>

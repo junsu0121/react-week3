@@ -6,18 +6,38 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 //firebase에 유저정보 바로 업데이트 위한 임포트
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const id_ref = React.useRef(null);
   const name_ref = React.useRef(null);
   const pw_ref = React.useRef(null);
   const repw_ref = React.useRef(null);
+  const emailCheck = (email) => {
+    let _reg =
+      /^[0-9a-zA-Z]([-_.0-9a-zA-Z])*@[0-9a-zA-Z]([-_.0-9a-zA-Z])*.([a-zA-Z])*/;
+    return _reg.test(email);
+  };
+
   const signupFB = async () => {
     //올바른 값인지 확인 -> 벨리데이션
-    // if(id_ref.current.value === ""){
-    //   return false;
-    // }
+    //벨리데이션 필수!
+    if (id_ref.current.value === "" || pw_ref.current.value === "") {
+      window.alert("이메일 혹은 비밀번호가 공란! 입력해주세요!");
+      return;
+    }
+    if (!emailCheck(id_ref.current.value)) {
+      window.alert("이메일 형식이 맞지 않습니다!");
+      return;
+    }
+    if (pw_ref.current.value !== repw_ref.current.value) {
+      window.alert("비밀번호가 일치하지 않습니다.");
+      return;
+    } else {
+      navigate("/");
+    }
+
     const user = await createUserWithEmailAndPassword(
       auth,
       id_ref.current.value,
@@ -48,9 +68,7 @@ const SignUp = () => {
         />
         <h3>비밀번호 확인</h3>
         <Input placeholder="비밀번호를 다시 입력해주세요!" ref={repw_ref} />
-        <Link to="/">
-          <Btn onClick={signupFB}>Sign Up</Btn>
-        </Link>
+        <Btn onClick={signupFB}>Sign Up</Btn>
       </SignUpWrap>
     </>
   );
