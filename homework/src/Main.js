@@ -13,6 +13,7 @@ import { deleteContentFB } from "./redux/modules/homework";
 const Main = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const post = props.post;
   const content_list = useSelector((state) => state.homework.list);
   console.log(content_list, "글구나");
   // firestore 데이터 불러오기

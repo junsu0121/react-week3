@@ -77,14 +77,16 @@ export const modifyContentFB = (content_id) => {
     console.log(content_id.id, "id");
     const newContent = {
       content: content_id.content,
-      image_url: content_id.image_url.url,
+      image_url: content_id.image_url,
     };
+    // console.log(content_id.image_url, "dddddd");
     // console.log(newContent, "새로들어갈 content");
     const docRef = doc(db, "homework", content_id.id);
     await updateDoc(docRef, {
       content: content_id.content,
       image_url: content_id.image_url,
     });
+    // console.log(content_id.image_url, "지금");
     // console.log(getState().homework.list);
     const _content_list = getState().homework.list;
     //                            스토어.list
